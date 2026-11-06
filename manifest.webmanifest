@@ -1,0 +1,23 @@
+{
+  "name": "LiftMax",
+  "short_name": "LiftMax",
+  "description": "A reference board for where you are on every lift.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0B0E12",
+  "theme_color": "#0B0E12",
+  "icons": [
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}

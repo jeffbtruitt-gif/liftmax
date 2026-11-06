@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>LiftMax — Home</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Montserrat:ital,wght@0,800;1,800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0B0E12}
+a{color:#FF6A00;text-decoration:none}a:hover{color:#FF8A33}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #0B0E12; color: #F5F5F5; font-family: Inter, system-ui, sans-serif; display: flex; flex-direction: column; overflow: hidden">
+  <header style="padding: 56px 20px 12px; display: flex; align-items: center; justify-content: space-between">
+    <div style="font-family: Montserrat, sans-serif; font-weight: 800; font-style: italic; font-size: 28px; letter-spacing: -0.5px"><span style="color: #F5F5F5">LIFT</span><span style="color: #FF6A00">MAX</span></div>
+    <button aria-label="Settings" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid #2B3440; background: #151A20; color: #D7D9DC; display: flex; align-items: center; justify-content: center; cursor: pointer">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path></svg>
+    </button>
+  </header>
+
+  <div style="flex: 1; overflow-y: auto; padding: 8px 20px 20px; display: flex; flex-direction: column; gap: 10px">
+    <div style="font-size: 12px; font-weight: 600; letter-spacing: 2px; color: #9AA3AE; text-transform: uppercase; padding: 4px 2px">Program · 5 days</div>
+
+    <sc-for list="{{days}}" as="d" hint-placeholder-count="5">
+      <a href="Day.dc.html" style="display: flex; align-items: center; gap: 14px; padding: 14px 14px 14px 16px; border-radius: 16px; background: #151A20; border: 1px solid #2B3440; color: #F5F5F5">
+        <div style="width: 44px; height: 44px; border-radius: 12px; background: #0B0E12; border: 1px solid #2B3440; display: flex; align-items: center; justify-content: center; font-family: Montserrat, sans-serif; font-weight: 800; font-size: 18px; color: #FF6A00; flex-shrink: 0">{{d.num}}</div>
+        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px">
+          <div style="font-size: 16px; font-weight: 700">{{d.name}}</div>
+          <div style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: #D7D9DC">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FF6A00" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="4"></circle></svg>
+            <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Focus: {{d.focus}}</span>
+          </div>
+        </div>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9AA3AE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg>
+      </a>
+    </sc-for>
+
+    <div style="font-size: 12px; font-weight: 600; letter-spacing: 2px; color: #9AA3AE; text-transform: uppercase; padding: 14px 2px 4px">More</div>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+      <a href="Extras.dc.html" style="display: flex; flex-direction: column; gap: 10px; padding: 16px; border-radius: 16px; background: #151A20; border: 1px solid #2B3440; color: #F5F5F5">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF6A00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 6.5v11M17.5 6.5v11M3 9.5v5M21 9.5v5M6.5 12h11"></path></svg>
+        <div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 15px; font-weight: 700">Extras</span><span style="font-size: 12px; color: #9AA3AE">6 accessories</span></div>
+      </a>
+      <a href="Log.dc.html" style="display: flex; flex-direction: column; gap: 10px; padding: 16px; border-radius: 16px; background: #151A20; border: 1px solid #2B3440; color: #F5F5F5">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF6A00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><path d="M14 3v6h6M8 13h8M8 17h5"></path></svg>
+        <div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 15px; font-weight: 700">Workouts</span><span style="font-size: 12px; color: #9AA3AE">Saved go-to sessions</span></div>
+      </a>
+    </div>
+  </div>
+
+  <nav aria-label="Main" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 8px 12px 28px; background: #0B0E12; border-top: 1px solid #2B3440">
+    <a href="Main.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px; min-height: 44px; color: #FF6A00; font-size: 11px; font-weight: 600">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"></rect><path d="M3 9h18M8 2v4M16 2v4"></path></svg>Days</a>
+    <a href="Extras.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px; min-height: 44px; color: #9AA3AE; font-size: 11px; font-weight: 600">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 6.5v11M17.5 6.5v11M3 9.5v5M21 9.5v5M6.5 12h11"></path></svg>Extras</a>
+    <a href="Log.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px; min-height: 44px; color: #9AA3AE; font-size: 11px; font-weight: 600">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><path d="M14 3v6h6M8 13h8M8 17h5"></path></svg>Workouts</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      days: [
+        { num: '1', name: 'Legs', focus: 'Barbell Squat' },
+        { num: '2', name: 'Chest, Back & Arms', focus: 'Barbell Bench Press' },
+        { num: '3', name: 'Glutes, Hamstrings & Core', focus: 'Hip Thrust Machine' },
+        { num: '4', name: 'Shoulders, Chest & Back', focus: 'Dumbbell Shoulder Press' },
+        { num: '5', name: 'Arms & Core', focus: 'EZ-Bar Preacher Curls' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

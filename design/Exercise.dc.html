@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>LiftMax — Barbell Squat</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Montserrat:ital,wght@0,800;1,800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0B0E12}
+a{color:#FF6A00;text-decoration:none}a:hover{color:#FF8A33}
+input:focus,textarea:focus{outline:2px solid #FF6A00;outline-offset:1px}
+</style>
+</helmet>
+<div style="width: 390px; min-height: 1300px; box-sizing: border-box; background: #0B0E12; color: #F5F5F5; font-family: Inter, system-ui, sans-serif; display: flex; flex-direction: column">
+  <header style="padding: 52px 12px 8px; display: flex; align-items: center; justify-content: space-between">
+    <a href="Day.dc.html" aria-label="Back to Legs" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #F5F5F5">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg>
+    </a>
+    <div style="font-size: 12px; font-weight: 600; letter-spacing: 2px; color: #9AA3AE; text-transform: uppercase">Day 1 · Legs</div>
+    <button aria-label="Exercise options" style="width: 44px; height: 44px; border: 0; background: transparent; color: #F5F5F5; display: flex; align-items: center; justify-content: center; cursor: pointer">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.8"></circle><circle cx="12" cy="12" r="1.8"></circle><circle cx="19" cy="12" r="1.8"></circle></svg>
+    </button>
+  </header>
+
+  <section style="padding: 0 20px 18px; display: flex; flex-direction: column; gap: 10px">
+    <span style="align-self: flex-start; display: inline-flex; align-items: center; gap: 5px; padding: 4px 9px; border-radius: 999px; background: #FF6A00; color: #0B0E12; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="3"></circle></svg>Focus today</span>
+    <h1 style="margin: 0; font-family: Montserrat, sans-serif; font-weight: 800; font-size: 30px; letter-spacing: -0.5px">Barbell Squat</h1>
+    <a href="https://www.google.com/search?q=barbell+squat+form+tips" style="align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; border-radius: 12px; border: 1px solid #2B3440; background: #151A20; color: #F5F5F5; font-size: 14px; font-weight: 600">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FF6A00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+      Form &amp; tips
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9AA3AE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"></path></svg>
+    </a>
+  </section>
+
+  <section style="padding: 0 20px; display: flex; flex-direction: column; gap: 10px">
+    <div style="display: flex; align-items: center; justify-content: space-between">
+      <h2 style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: 2px; color: #9AA3AE; text-transform: uppercase">Variations</h2>
+      <span style="font-size: 12px; color: #9AA3AE">Main shows on the Day screen</span>
+    </div>
+
+    <sc-for list="{{vars}}" as="v" hint-placeholder-count="3">
+      <div style="border-radius: 16px; background: #151A20; border: 1px solid #2B3440; padding: 14px; display: flex; flex-direction: column; gap: 12px">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px">
+          <div style="display: flex; flex-direction: column; gap: 4px">
+            <span style="display: flex; align-items: center; gap: 8px">
+              <span style="font-size: 16px; font-weight: 700">{{v.name}}</span>
+              <sc-if value="{{v.isMain}}" hint-placeholder-val="{{false}}"><span style="padding: 2px 8px; border-radius: 999px; border: 1px solid #FF6A00; color: #FF6A00; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase">Main</span></sc-if>
+            </span>
+            <span style="font-size: 12px; color: #9AA3AE">Updated {{v.updated}}</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 2px">
+          <sc-if value="{{v.notMain}}" hint-placeholder-val="{{true}}">
+            <button type="button" onClick="{{v.makeMain}}" style="min-height: 44px; padding: 0 10px; border: 0; background: transparent; color: #FF6A00; font: 600 13px Inter, sans-serif; cursor: pointer">Set as main</button>
+          </sc-if>
+          <button type="button" onClick="{{v.toggleMenu}}" aria-label="Edit or delete {{v.name}}" style="width: 44px; height: 44px; border: 0; background: transparent; color: #9AA3AE; display: flex; align-items: center; justify-content: center; cursor: pointer">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.8"></circle><circle cx="12" cy="12" r="1.8"></circle><circle cx="19" cy="12" r="1.8"></circle></svg>
+          </button>
+          </div>
+        </div>
+        <sc-if value="{{v.menuOpen}}" hint-placeholder-val="{{false}}">
+          <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+            <button type="button" style="min-height: 44px; border-radius: 12px; border: 1px solid #2B3440; background: #0B0E12; color: #F5F5F5; font: 600 13px Inter, sans-serif; cursor: pointer">Rename</button>
+            <button type="button" style="min-height: 44px; border-radius: 12px; border: 1px solid #6B2A2A; background: #0B0E12; color: #FF8A80; font: 600 13px Inter, sans-serif; cursor: pointer">Delete variation</button>
+          </div>
+        </sc-if>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+          <label style="display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: #9AA3AE">Weight
+            <input type="text" defaultValue="{{v.weight}}" style="height: 48px; box-sizing: border-box; padding: 0 12px; border-radius: 12px; border: 1px solid #2B3440; background: #0B0E12; color: #F5F5F5; font: 700 18px Inter, sans-serif; font-variant-numeric: tabular-nums">
+          </label>
+          <label style="display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: #9AA3AE">Reps
+            <input type="text" defaultValue="{{v.reps}}" style="height: 48px; box-sizing: border-box; padding: 0 12px; border-radius: 12px; border: 1px solid #2B3440; background: #0B0E12; color: #F5F5F5; font: 700 18px Inter, sans-serif; font-variant-numeric: tabular-nums">
+          </label>
+        </div>
+        <label style="display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: #FFB27A">Focus-day plan
+          <textarea rows="3" defaultValue="{{v.focusNote}}" style="box-sizing: border-box; padding: 10px 12px; border-radius: 12px; border: 1px solid #5A3418; background: #1A1410; color: #F5F5F5; font: 500 14px/1.5 Inter, sans-serif; resize: vertical"></textarea>
+        </label>
+      </div>
+    </sc-for>
+
+    <button style="min-height: 48px; border-radius: 14px; border: 1px dashed #4A5563; background: transparent; color: #D7D9DC; font: 600 14px Inter, sans-serif; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FF6A00" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+      Add variation
+    </button>
+  </section>
+
+  <section style="padding: 22px 20px 40px; display: flex; flex-direction: column; gap: 10px">
+    <label style="display: flex; flex-direction: column; gap: 10px">
+      <span style="font-size: 12px; font-weight: 600; letter-spacing: 2px; color: #9AA3AE; text-transform: uppercase">General notes</span>
+      <textarea rows="4" defaultValue="{{generalNote}}" style="box-sizing: border-box; padding: 12px; border-radius: 14px; border: 1px solid #2B3440; background: #151A20; color: #F5F5F5; font: 400 14px/1.5 Inter, sans-serif; resize: vertical"></textarea>
+    </label>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1300}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { main: 0, menu: 1 };
+  }
+  renderVals() {
+    var self = this;
+    var base = [
+        { name: 'Barbell', updated: 'Oct 28', weight: '185 lbs', reps: '8', focusNote: '205 lbs × 5, 4 sets' },
+        { name: 'Smith machine', updated: 'Sep 30', weight: '155 lbs', reps: '10', focusNote: '175 lbs × 6' },
+        { name: 'Goblet (dumbbell)', updated: 'Aug 14', weight: '60 lbs', reps: '12', focusNote: '70 lbs × 10' }
+    ];
+    var m = this.state.main;
+    var ordered = [base[m]].concat(base.filter(function (b, i) { return i !== m; }));
+    return {
+      vars: ordered.map(function (v) {
+        var idx = base.indexOf(v);
+        return Object.assign({}, v, { isMain: idx === m, notMain: idx !== m, makeMain: function () { self.setState({ main: idx }); },
+          menuOpen: self.state.menu === idx,
+          toggleMenu: function () { self.setState({ menu: self.state.menu === idx ? -1 : idx }); } });
+      }),
+      generalNote: 'Shoes off, feet just outside shoulders. Rack pins at notch 7. Keep it to 3 sets on run weeks.'
+    };
+  }
+}
+</script>
+</body>
+</html>
