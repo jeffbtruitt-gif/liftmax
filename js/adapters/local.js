@@ -34,6 +34,7 @@ const matches = (row, where) => !where || Object.entries(where).every(([k, v]) =
 
 export const localAdapter = {
   name: 'local',
+  requiresAuth: false,
 
   async list(table, where) {
     return clone(load()[table].filter((r) => matches(r, where)));

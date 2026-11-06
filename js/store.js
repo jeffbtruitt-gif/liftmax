@@ -17,19 +17,54 @@ const nextPosition = (rows) => rows.reduce((m, r) => Math.max(m, r.position ?? 0
 
 // ---------- setup ----------
 
+/**
+ * Picks the backend and loads data. Returns { signedIn: false } when the cloud backend
+ * needs a sign-in first — call signIn(), then init() again.
+ */
 export async function init() {
   if (CONFIG.backend === 'supabase') {
-    const { createSupabaseAdapter } = await import('./adapters/supabase.js');
-    A = await createSupabaseAdapter(CONFIG.supabase);
+    if (!A.requiresAuth) {
+      const { createSupabaseAdapter } = await import('./adapters/supabase.js');
+      A = await createSupabaseAdapter(CONFIG.supabase);
+    }
+    if (!(await A.getUser())) return { signedIn: false };
+    await A.load();
   } else {
     A = localAdapter;
   }
   const days = await A.list('days');
-  if (!days.length) await seed();
+  if (!days.length && !A.offline) await seed();
+  return { signedIn: true };
 }
 
 export function backendName() {
   return A.name;
+}
+
+/** True when showing the last synced copy because the server can't be reached. */
+export function isOffline() {
+  return !!A.offline;
+}
+
+export function requiresAuth() {
+  return !!A.requiresAuth;
+}
+
+export async function currentUser() {
+  return A.getUser ? A.getUser() : null;
+}
+
+export async function signIn(email, password) {
+  return A.signIn(email, password);
+}
+
+export async function signOut() {
+  if (A.signOut) await A.signOut();
+}
+
+/** Re-reads everything from the server (e.g. when the app comes back to the foreground). */
+export async function refresh() {
+  if (A.load) await A.load();
 }
 
 function makeExercise({ name, dayId = null, extrasGroupId = null, position, variationName }) {

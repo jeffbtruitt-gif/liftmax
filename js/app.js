@@ -68,8 +68,26 @@ app.addEventListener('focusout', (e) => {
 });
 
 window.addEventListener('pagehide', () => { flushAll(); });
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'hidden') flushAll();
+
+// Cloud sync: when the app comes back to the foreground, pull changes made on other devices.
+let signedIn = false;
+let lastRefresh = Date.now();
+document.addEventListener('visibilitychange', async () => {
+  if (document.visibilityState === 'hidden') return flushAll();
+  if (!signedIn || !S.requiresAuth() || Date.now() - lastRefresh < 5000) return;
+  lastRefresh = Date.now();
+  const wasOffline = S.isOffline();
+  await flushAll();
+  try {
+    await S.refresh();
+  } catch {
+    return;
+  }
+  if (wasOffline && !S.isOffline()) toast('Back online');
+  // Don't yank the screen out from under someone mid-edit.
+  const active = document.activeElement;
+  const editing = active && app.contains(active) && /^(INPUT|TEXTAREA|SELECT)$/.test(active.tagName);
+  if (!editing && !document.querySelector('dialog[open]')) render();
 });
 
 // ---------------------------------------------------------------- routing
@@ -82,6 +100,7 @@ function parseRoute() {
 
 async function render() {
   await flushAll();
+  if (!signedIn) return renderSignIn();
   if (isLocked()) return renderLock();
 
   const route = parseRoute();
@@ -498,32 +517,44 @@ app.addEventListener('submit', (e) => {
 
 async function viewSettings() {
   const [days, extras, workouts] = await Promise.all([S.getDays(), S.getExtrasExercises(), S.getWorkouts()]);
+  const cloud = S.requiresAuth();
+  const user = cloud ? await S.currentUser() : null;
   return {
     title: 'Settings', tab: 'days',
     html: `
     <header class="hdr-bar left">${backButton('#/', 'Back to days')}<p class="eyebrow">Settings</p></header>
     <div class="title-block"><h1 class="h1" tabindex="-1">Settings</h1></div>
     <main class="scroll pad"><div class="stack" style="gap:14px">
+      ${cloud ? `
+      <section class="card">
+        <h2>Account</h2>
+        <div class="kv"><span>Signed in as</span><span class="ellipsis" style="min-width:0">${esc(user?.email || '')}</span></div>
+        <div class="kv"><span>Sync</span><span>${S.isOffline() ? 'Offline — read only' : 'On, all devices'}</span></div>
+        <p>Your data saves to the cloud and shows up on any device where you sign in with this account.</p>
+        <div class="btns"><button type="button" class="btn" data-action="sign-out">Sign out</button></div>
+      </section>` : ''}
       <section class="card">
         <h2>Your data</h2>
-        <div class="kv"><span>Stored</span><span>${S.backendName() === 'supabase' ? 'Supabase (cloud)' : 'On this device'}</span></div>
+        <div class="kv"><span>Stored</span><span>${cloud ? 'Supabase (cloud)' : 'On this device'}</span></div>
         <div class="kv"><span>Program days</span><span>${days.length}</span></div>
         <div class="kv"><span>Extras</span><span>${extras.length}</span></div>
         <div class="kv"><span>Saved workouts</span><span>${workouts.length}</span></div>
-        <p>Data saved on this device stays in this browser. Export a backup before clearing browser data or switching phones.</p>
+        <p>${cloud
+          ? 'A backup is a JSON file of everything here — handy before a reset, or to move data between accounts.'
+          : 'Data saved on this device stays in this browser. Export a backup before clearing browser data or switching phones.'}</p>
         <div class="btns">
           <button type="button" class="btn" data-action="export">Export backup</button>
           <button type="button" class="btn" data-action="import">Import backup</button>
           <input type="file" id="import-file" accept="application/json,.json" class="hidden" aria-label="Backup file">
         </div>
       </section>
-      <section class="card">
+      ${cloud ? '' : `<section class="card">
         <h2>Passcode</h2>
         <p>${CONFIG.passcodeEnabled
           ? 'A passcode is required each time the app opens in a new session.'
           : 'Off. The passcode screen is a stub — turn it on with <code>passcodeEnabled</code> in <code>js/config.js</code>.'}</p>
         ${CONFIG.passcodeEnabled ? '<div class="btns"><button type="button" class="btn" data-action="lock">Lock now</button></div>' : ''}
-      </section>
+      </section>`}
       <section class="card">
         <h2>Start over</h2>
         <p>Restores the 5-day starter program and the default extras with empty weights. Deletes your variations, notes and saved workouts.</p>
@@ -566,9 +597,57 @@ app.addEventListener('change', (e) => {
 
 // ---------------------------------------------------------------- Passcode (stub)
 
+// ---------------------------------------------------------------- Sign-in (cloud sync)
+
+function renderSignIn(message = '') {
+  document.title = 'Sign in · LiftMax';
+  app.innerHTML = `
+  <main class="lock">
+    <div class="wordmark" style="font-size:40px" role="img" aria-label="LiftMax"><span>LIFT</span><span class="max">MAX</span></div>
+    <form id="signin-form" novalidate>
+      <h1 class="sheet-title" style="text-align:center" tabindex="-1">Sign in to sync</h1>
+      <label class="field">Email
+        <input class="input signin" name="email" type="email" autocomplete="username" inputmode="email" autocapitalize="off" required>
+      </label>
+      <label class="field">Password
+        <input class="input signin" name="password" type="password" autocomplete="current-password" required>
+      </label>
+      <div class="err" role="alert">${esc(message)}</div>
+      <button class="btn primary big" type="submit">Sign in</button>
+      <p class="sub" style="text-align:center;font-size:12px;margin:0">Use the same account as your other apps.</p>
+    </form>
+  </main>`;
+  const form = document.getElementById('signin-form');
+  form.elements.email.focus();
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = form.elements.email.value.trim();
+    const password = form.elements.password.value;
+    const err = form.querySelector('.err');
+    const btn = form.querySelector('button[type=submit]');
+    if (!email || !password) return (err.textContent = 'Enter your email and password');
+    btn.disabled = true;
+    btn.textContent = 'Signing in…';
+    err.textContent = '';
+    try {
+      await S.signIn(email, password);
+      await S.init();
+      signedIn = true;
+      lastRouteKey = '';
+      render();
+    } catch (ex) {
+      err.textContent = ex.message;
+      btn.disabled = false;
+      btn.textContent = 'Sign in';
+    }
+  });
+}
+
+// ---------------------------------------------------------------- Passcode (stub, local mode only)
+
 const UNLOCK_KEY = 'liftmax.unlocked';
 function isLocked() {
-  if (!CONFIG.passcodeEnabled) return false;
+  if (!CONFIG.passcodeEnabled || S.requiresAuth()) return false;
   try { return sessionStorage.getItem(UNLOCK_KEY) !== '1'; } catch { return true; }
 }
 
@@ -809,6 +888,19 @@ const ACTIONS = {
     toast('Reset to starter program');
     goto('#/');
   },
+  async 'sign-out'() {
+    const ok = await confirmSheet({
+      title: 'Sign out?',
+      message: 'Your data stays saved in the cloud. Sign in again to see it.',
+      confirmLabel: 'Sign out',
+      danger: false,
+    });
+    if (!ok) return;
+    await S.signOut();
+    signedIn = false;
+    location.hash = '#/';
+    renderSignIn();
+  },
   async lock() {
     try { sessionStorage.removeItem(UNLOCK_KEY); } catch {}
     render();
@@ -841,13 +933,15 @@ const VIEWS = {
 
 (async function boot() {
   try {
-    await S.init();
+    signedIn = (await S.init()).signedIn;
   } catch (err) {
     console.error(err);
-    app.innerHTML = `<div class="scroll pad" style="padding-top:60px"><div class="empty-state">LiftMax couldn't load its data.<br>${esc(err.message)}</div></div>`;
+    app.innerHTML = `<div class="scroll pad" style="padding-top:60px"><div class="empty-state">LiftMax couldn't load its data.<br>${esc(err.message)}
+      <button type="button" class="btn primary" onclick="location.reload()">Try again</button></div></div>`;
     return;
   }
   render();
+  if (S.isOffline()) toast("You're offline — showing your last synced data", 3500);
   if ('serviceWorker' in navigator && location.protocol === 'https:') {
     navigator.serviceWorker.register('./sw.js').catch(() => {});
   }

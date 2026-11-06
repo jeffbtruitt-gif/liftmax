@@ -346,3 +346,6 @@ dialog.sheet::backdrop { background: rgba(0, 0, 0, 0.6); }
 
 h1:focus { outline: none; }
 code { font-size: 12px; background: var(--black); padding: 1px 5px; border-radius: 6px; color: var(--concrete); }
+.lock .input.signin { text-align: left; letter-spacing: normal; font-size: 16px; font-weight: 600; }
+.lock form { max-width: 340px; }
+.btn:disabled { opacity: 0.6; cursor: default; }

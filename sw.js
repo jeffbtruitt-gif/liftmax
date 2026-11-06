@@ -1,6 +1,6 @@
 // Offline support: network first, falling back to the last cached copy.
 // Network-first means a new deploy shows up on the next load without a version bump.
-const CACHE = 'liftmax-v1';
+const CACHE = 'liftmax-v2';
 const SHELL = [
   './', './index.html', './css/styles.css', './manifest.webmanifest', './icons/icon.svg',
   './js/app.js', './js/store.js', './js/ui.js', './js/config.js', './js/seed.js',
@@ -23,7 +23,7 @@ self.addEventListener('fetch', (e) => {
   const req = e.request;
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
-  const cacheable = url.origin === location.origin || url.hostname.endsWith('fonts.googleapis.com') || url.hostname.endsWith('fonts.gstatic.com');
+  const cacheable = url.origin === location.origin || url.hostname.endsWith('fonts.googleapis.com') || url.hostname.endsWith('fonts.gstatic.com') || url.hostname === 'cdn.jsdelivr.net';
   if (!cacheable) return;
   e.respondWith(
     fetch(req)
