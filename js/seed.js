@@ -1,4 +1,4 @@
-// Fixed starter program. The 5 days and their 5 exercises each can't be added or deleted.
+// Fixed starter program. The 5 days and their exercises can't be added or deleted in the app.
 // Each entry: [exercise name, starting variation (equipment)]. The first-listed Focus is marked.
 
 export const SEED_DAYS = [
@@ -25,6 +25,7 @@ export const SEED_DAYS = [
   {
     number: 3, name: 'Glutes, Hamstrings & Core', subtitle: 'Glutes, hamstrings, lower back, abs', focus: 'Hip Thrust Machine',
     exercises: [
+      ['Power Clean', 'Barbell'],
       ['Hip Thrust Machine', 'Machine'],
       ['Single-Leg Romanian Deadlift', 'Dumbbell'],
       ['Back Extension', 'Bodyweight'],
