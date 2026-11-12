@@ -302,7 +302,7 @@ svg { display: block; flex-shrink: 0; }
 
 /* ---------- tab bar ---------- */
 .tabbar {
-  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
   padding: 8px 12px calc(10px + var(--safe-bottom)); background: var(--black);
   border-top: 1px solid var(--steel); flex-shrink: 0;
 }
@@ -349,3 +349,35 @@ code { font-size: 12px; background: var(--black); padding: 1px 5px; border-radiu
 .lock .input.signin { text-align: left; letter-spacing: normal; font-size: 16px; font-weight: 600; }
 .lock form { max-width: 340px; }
 .btn:disabled { opacity: 0.6; cursor: default; }
+
+/* ---------- exercises (all, A–Z) ---------- */
+.search-wrap { padding: 0 20px 12px; }
+.search {
+  display: flex; align-items: center; gap: 10px; height: 48px; padding: 0 14px;
+  border-radius: var(--r-input); border: 1px solid var(--steel); background: var(--card);
+}
+.search:focus-within { outline: 2px solid var(--orange); outline-offset: 1px; }
+.search input {
+  flex: 1; min-width: 0; height: 100%; border: 0; background: transparent; color: var(--chalk);
+  font: 500 16px Inter, sans-serif; outline: none;
+}
+.search input::-webkit-search-cancel-button { filter: invert(0.7); }
+.all-card {
+  border-radius: var(--r-card); background: var(--card); border: 1px solid var(--steel);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.all-head {
+  display: flex; align-items: center; gap: 10px; padding: 12px 14px 10px 16px; min-height: 44px;
+  color: var(--chalk);
+}
+.all-head:hover .name { color: var(--orange); }
+.all-title { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.all-title .name { font-size: 16px; font-weight: 700; }
+.all-title .where { font-size: 12px; color: var(--muted); }
+.all-row {
+  display: grid; grid-template-columns: minmax(0, 1fr) 104px 64px; align-items: center; gap: 8px;
+  padding: 8px 12px 8px 16px; border-top: 1px solid var(--steel);
+}
+.all-vname { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--concrete); min-width: 0; }
+.all-field { display: block; min-width: 0; }
+.input.sm { height: 44px; font-size: 16px; padding: 0 10px; }

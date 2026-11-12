@@ -104,11 +104,17 @@ async function render() {
   if (isLocked()) return renderLock();
 
   const route = parseRoute();
+  // Remember whether an exercise was opened from the Exercises tab, so Back returns there.
+  if (route.name === 'exercises') cameFromExercises = true;
+  else if (route.name !== 'ex') cameFromExercises = false;
   const routeKey = `${route.name}/${route.id || ''}`;
   const sameRoute = routeKey === lastRouteKey;
   if (!sameRoute) ui = { varMenu: null, extraMenu: null };
   const scroller = app.querySelector('.scroll');
-  const scrollTop = sameRoute && scroller ? scroller.scrollTop : 0;
+  if (lastRouteKey === 'exercises/' && scroller) exercisesScroll = scroller.scrollTop;
+  const scrollTop = sameRoute && scroller
+    ? scroller.scrollTop
+    : routeKey === 'exercises/' ? exercisesScroll : 0;
 
   let view;
   try {
@@ -121,12 +127,15 @@ async function render() {
   app.innerHTML = view.html + (view.tab === false ? '' : tabBar(view.tab));
   lastRouteKey = routeKey;
 
+  if (route.name === 'exercises') applyExerciseFilter();
   const newScroller = app.querySelector('.scroll');
   if (newScroller) newScroller.scrollTop = scrollTop;
   if (!sameRoute) app.querySelector('h1')?.focus?.({ preventScroll: true });
 }
 
 const rerender = () => render();
+let cameFromExercises = false;
+let exercisesScroll = 0;
 
 window.addEventListener('hashchange', render);
 
@@ -135,6 +144,7 @@ function tabBar(active) {
     `<a class="tab" href="${href}"${active === key ? ' aria-current="page"' : ''}>${ic()}${label}</a>`;
   return `<nav class="tabbar" aria-label="Main">
     ${tab('days', '#/', 'Days', icon.days)}
+    ${tab('exercises', '#/exercises', 'Exercises', icon.list)}
     ${tab('extras', '#/extras', 'Extras', icon.extras)}
     ${tab('workouts', '#/workouts', 'Workouts', icon.workouts)}
   </nav>`;
@@ -295,6 +305,10 @@ async function viewExercise(id) {
     backHref = '#/extras';
     backLabel = 'Back to extras';
   }
+  if (cameFromExercises) {
+    backHref = '#/exercises';
+    backLabel = 'Back to exercises';
+  }
 
   const tipsUrl = 'https://www.google.com/search?q=' + encodeURIComponent(`${ex.name} form tips`);
 
@@ -334,7 +348,7 @@ async function viewExercise(id) {
   }).join('');
 
   return {
-    title: ex.name, tab: isProgram ? 'days' : 'extras',
+    title: ex.name, tab: cameFromExercises ? 'exercises' : isProgram ? 'days' : 'extras',
     html: `
     <header class="hdr-bar">
       ${backButton(backHref, backLabel)}
@@ -368,6 +382,101 @@ async function viewExercise(id) {
     </main>`,
   };
 }
+
+// ---------------------------------------------------------------- Exercises (all, A–Z)
+
+let exercisesQuery = '';
+
+async function viewAllExercises() {
+  const days = await S.getDays();
+  const [groups, dayExercises, extras, varsBy] = await Promise.all([
+    S.getExtrasGroups(),
+    Promise.all(days.map((d) => S.getExercisesForDay(d.id))),
+    S.getExtrasExercises(), S.getVariationsByExercise(),
+  ]);
+  const dayById = Object.fromEntries(days.map((d) => [d.id, d]));
+  const groupById = Object.fromEntries(groups.map((g) => [g.id, g]));
+  const all = [...dayExercises.flat(), ...extras].sort((a, b) =>
+    a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
+
+  const where = (ex) => {
+    if (ex.dayId) {
+      const d = dayById[ex.dayId];
+      return d ? `Day ${d.number} · ${d.name}` : 'Program';
+    }
+    const g = groupById[ex.extrasGroupId];
+    return g ? `Extras · ${g.name}` : 'Extras';
+  };
+
+  const cards = all.map((ex) => {
+    const vars = mainFirst(ex, varsBy[ex.id]);
+    const main = mainOf(ex, vars);
+    const search = [ex.name, where(ex), ...vars.map((v) => v.name)].join(' ').toLowerCase();
+    const rows = vars.map((v) => `
+      <div class="all-row">
+        <span class="all-vname">
+          <span class="ellipsis">${esc(v.name)}</span>${v.id === main?.id ? '<span class="tag-main">Main</span>' : ''}
+        </span>
+        <label class="all-field"><span class="sr-only">${esc(ex.name)}, ${esc(v.name)} weight</span>
+          <input class="input sm" type="text" data-save="var" data-id="${v.id}" data-field="weight" value="${esc(v.weight)}" placeholder="Weight" autocomplete="off" enterkeyhint="done">
+        </label>
+        <label class="all-field reps"><span class="sr-only">${esc(ex.name)}, ${esc(v.name)} reps</span>
+          <input class="input sm" type="text" data-save="var" data-id="${v.id}" data-field="reps" value="${esc(v.reps)}" placeholder="Reps" autocomplete="off" enterkeyhint="done">
+        </label>
+      </div>`).join('');
+    return `
+    <section class="all-card" data-search="${esc(search)}" aria-label="${esc(ex.name)}">
+      <a class="all-head" href="#/ex/${ex.id}">
+        <span class="all-title">
+          <span class="name">${esc(ex.name)}</span>
+          <span class="where">${esc(where(ex))}</span>
+        </span>
+        ${icon.chevron()}
+      </a>
+      ${rows || '<div class="all-row"><span class="all-vname" style="color:var(--muted)">No variations yet</span></div>'}
+    </section>`;
+  }).join('');
+
+  const n = all.length;
+  return {
+    title: 'Exercises', tab: 'exercises',
+    html: `
+    <header class="hdr-title">
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <h1 class="h1" tabindex="-1">Exercises</h1>
+        <div class="sub">${n} exercises, A–Z · edit weights here</div>
+      </div>
+    </header>
+    <div class="search-wrap">
+      <label class="search">
+        ${icon.search({ stroke: '#9AA3AE' })}
+        <span class="sr-only">Search exercises</span>
+        <input type="search" id="ex-search" value="${esc(exercisesQuery)}" placeholder="Search exercises or variations" autocomplete="off" enterkeyhint="search">
+      </label>
+    </div>
+    <main class="scroll pad"><div class="stack" id="all-list">
+      ${cards}
+      <div class="empty-state hidden" id="all-empty">No exercises match that search.</div>
+    </div></main>`,
+  };
+}
+
+function applyExerciseFilter() {
+  const q = exercisesQuery.trim().toLowerCase();
+  let shown = 0;
+  app.querySelectorAll('.all-card').forEach((card) => {
+    const match = !q || card.dataset.search.includes(q.replace(/\s+/g, ' '));
+    card.classList.toggle('hidden', !match);
+    if (match) shown++;
+  });
+  document.getElementById('all-empty')?.classList.toggle('hidden', shown > 0);
+}
+
+app.addEventListener('input', (e) => {
+  if (e.target.id !== 'ex-search') return;
+  exercisesQuery = e.target.value;
+  applyExerciseFilter();
+});
 
 // ---------------------------------------------------------------- Extras
 
@@ -923,6 +1032,7 @@ const VIEWS = {
   home: viewHome,
   day: viewDay,
   ex: viewExercise,
+  exercises: viewAllExercises,
   extras: viewExtras,
   workouts: viewWorkouts,
   workout: viewWorkout,
